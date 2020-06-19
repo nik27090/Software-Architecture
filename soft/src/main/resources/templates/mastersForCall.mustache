@@ -1,0 +1,30 @@
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <title>Spring Security Example </title>
+</head>
+<body>
+Админская
+
+<div>Список мастеров</div>
+{{#master}}
+    <div>
+        <div><b>{{id}}</b></div>
+        <span>ФИО: {{fullName}}</span>
+        <div>Описание: {{desc}}</div>
+        <span>
+            <form action="/admin/masterCall/{{idCall}}/selectMaster" method="post">
+                <label><input type="hidden" name="idMaster" value="{{id}}"/></label>
+                <input type="hidden" name="_csrf" value="{{_csrf.token}}"/>
+                <input type="submit" value="Назначить"/>
+            </form>
+        </span>
+    </div>
+{{/master}}
+<div>
+    <form action="/logout" method="post">
+        <input type="submit" value="Sign Out"/>
+    </form>
+    <input type="hidden" name="_csrf" value="{{_csrf.token}}"/>
+</div>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <title>Spring Security Example </title>
+</head>
+<body>
+<div>Предложения мастера</div>
+{{#offers}}
+    <div>
+        <div>{{offers}}</div>
+    </div>
+{{/offers}}
+<div>
+    <form action="/logout" method="post">
+        <input type="submit" value="Sign Out"/>
+        <input type="hidden" name="_csrf" value="{{_csrf.token}}"/>
+    </form>
+</div>
+</body>
+</html>

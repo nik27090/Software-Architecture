@@ -1,0 +1,41 @@
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <title>Spring Security Example </title>
+</head>
+<body>
+<div><h1>Список masterCalls</h1></div>
+{{#masterCalls}}
+    <div>
+        <div><b>{{id}}</b></div>
+        <span>Клиент: {{client}}</span>
+        <span>Статус: {{status}}</span>
+        <span>{{#master}}Мастер:{{master}}{{/master}}</span>
+        <span>Цена: {{price}}</span>
+        <div>Описание: {{desc}}</div>
+        <div>Отчет: {{conclusion}}</div>
+        <a href="/master/report/{{id}}">Написать отчет</a>
+        <a href="/master/closeCall/{{id}}">Закрыть заказ</a>
+    </div>
+{{/masterCalls}}
+<div><h1>Список keyCar</h1></div>
+{{#keyCar}}
+    <div>
+        <div><b>{{id}}</b></div>
+        <span>Клиент: {{client}}</span>
+        <span>Статус: {{status}}</span>
+        <span>{{#master}}Мастер:{{master}}{{/master}}</span>
+        <span>Цена: {{price}}</span>
+        <div>Описание: {{desc}}</div>
+        <a href="/master/addOffer/{{id}}">Добваить предожение</a>
+        <a href="/keyCar/offers/{{id}}">Посмотреть предложения</a>
+        <a href="/master/closeKeyCar/{{id}}">Закрыть заказ</a>
+    </div>
+{{/keyCar}}
+<div>
+    <form action="/logout" method="post">
+        <input type="submit" value="Sign Out"/>
+        <input type="hidden" name="_csrf" value="{{_csrf.token}}" />
+    </form>
+</div>
+</body>
+</html>

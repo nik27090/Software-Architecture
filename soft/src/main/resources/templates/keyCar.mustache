@@ -1,0 +1,17 @@
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <title>Spring Security Example </title>
+</head>
+<body>
+Оформление машины под ключ
+<div>Укажите ваш бюджет, марку и модель машины, желательные характеристики и период поиска авто</div>
+{{#message}}
+    {{message}}
+{{/message}}
+<form action="/client/keyCar" method="post">
+    <div><label> description: <input type="text" name="desc"/> </label></div>
+    <input type="hidden" name="_csrf" value="{{_csrf.token}}"/>
+    <div><input type="submit" value="Отправить"/></div>
+</form>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <title>Spring Security Example </title>
+</head>
+<body>
+Вызов мастера
+<div>Укажите пожалуйста место и время встречи. А так же опишите автомобиль который будет осматриваться
+    или приложите ссылку на анкету автомобиля</div>
+{{#message}}
+    {{message}}
+{{/message}}
+<form action="/client/masterCall" method="post">
+    <div><label> description: <input type="text" name="desc"/> </label></div>
+    <input type="hidden" name="_csrf" value="{{_csrf.token}}" />
+    <div><input type="submit" value="Отправить"/></div>
+</form>
+</body>
+</html>

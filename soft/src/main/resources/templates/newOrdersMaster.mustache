@@ -1,0 +1,40 @@
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <title>Spring Security Example </title>
+</head>
+<body>
+<div><h1>Список masterCalls</h1></div>
+{{#masterCalls}}
+    <div>
+        <div><b>{{id}}</b></div>
+        <span>Клиент: {{client}}</span>
+        <span>Статус: {{status}}</span>
+        <span>{{#master}}Мастер:{{master}}{{/master}}</span>
+        <span>Цена: {{price}}</span>
+        <div>Описание: {{desc}}</div>
+        <div>Отчет: {{conclusion}}</div>
+        <a href="/master/masterCall/{{id}}/ok">Принять заказ</a>
+        <a href="/master/masterCall/{{id}}/cancel">Отказаться от заказа</a>
+    </div>
+{{/masterCalls}}
+<div><h1>Список keyCar</h1></div>
+{{#keyCar}}
+    <div>
+        <div><b>{{id}}</b></div>
+        <span>Клиент: {{client}}</span>
+        <span>Статус: {{status}}</span>
+        <span>{{#master}}Мастер:{{master}}{{/master}}</span>
+        <span>Цена: {{price}}</span>
+        <div>Описание: {{desc}}</div>
+        <a href="/master/keyCar/{{id}}/ok">Принять заказ</a>
+        <a href="/master/keyCar/{{id}}/cancel">Отказаться от заказа</a>
+    </div>
+{{/keyCar}}
+<div>
+    <form action="/logout" method="post">
+        <input type="submit" value="Sign Out"/>
+        <input type="hidden" name="_csrf" value="{{_csrf.token}}"/>
+    </form>
+</div>
+</body>
+</html>

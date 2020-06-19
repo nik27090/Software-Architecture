@@ -1,0 +1,13 @@
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <title>Spring Security Example </title>
+</head>
+<body>
+Приложи ссылку, и рекомендацию
+<form action="/master/addOffer/{{idKeyCar}}" method="post">
+    <div><label> Offer: <input type="text" name="offer"/> </label></div>
+    <input type="hidden" name="_csrf" value="{{_csrf.token}}"/>
+    <div><input type="submit" value="Отправить"/></div>
+</form>
+</body>
+</html>

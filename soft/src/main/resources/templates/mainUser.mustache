@@ -1,0 +1,22 @@
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <title>Spring Security Example </title>
+</head>
+<body>
+Выберите услугу
+{{#message}}
+    {{message}}
+{{/message}}
+<form action="/client/mainUser" method="post">
+</form>
+<div><a href="/client/masterCall">Вызов мастера</a></div>
+<div><a href="/client/keyCar">Машина под ключ</a></div>
+<div><a href="/client/orders">Ваши заказы</a></div>
+<div>
+    <form action="/logout" method="post">
+        <input type="submit" value="Sign Out"/>
+        <input type="hidden" name="_csrf" value="{{_csrf.token}}" />
+    </form>
+</div>
+</body>
+</html>
