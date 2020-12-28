@@ -35,79 +35,79 @@ public class AdminService {
         this.personRepository = personRepository;
     }
 
-    public String masterReg(MasterRegistrationDto registrationDto, Person person, Map<String, Object> model) {
+    public Map<String, Object> masterReg(MasterRegistrationDto registrationDto, Person person, Map<String, Object> model) {
         Admin admin = person.getAdmin();
         admin.createMaster(registrationDto, masterRepository, personRepository);
 
         model.put("message", "Мастер зарегестрирован");
-        return "adminError";
+        return model;
     }
 
-    public String selectMasterForCall(String idCall, Person person, Long idMaster, Map<String, Object> model) {
+    public Map<String, Object> selectMasterForCall(String idCall, Person person, Long idMaster, Map<String, Object> model) {
         Admin admin = person.getAdmin();
         Optional<Master> master = masterRepository.findById(idMaster);
         Optional<MasterCall> masterCall = masterCallRepository.findById(Long.parseLong(idCall));
         if (master.isEmpty() || masterCall.isEmpty()) {
             model.put("message", "Ошибка в selectMaster");
-            return "adminError";
+            return model;
         }
         admin.selectMasterForCall(master.get(), masterCall.get(), masterCallRepository);
 
         model.put("message", "Мастеру отправленно уведовмление");
-        return "adminError";
+        return model;
     }
 
-    public String viewMastersForCall(String idCall, Map<String, Object> model) {
+    public Map<String, Object> viewMastersForCall(String idCall, Map<String, Object> model) {
         Optional<MasterCall> masterCall = masterCallRepository.findById(Long.parseLong(idCall));
 
         if (masterCall.isEmpty()) {
             model.put("message", "Заяки почему-то не существует");
-            return "adminError";
+            return model;
         } else if (masterCall.get().getMaster() != null) {
             model.put("message", "Мастер уже назначен");
-            return "adminError";
+            return model;
         }
         List<Master> masters = masterRepository.findAll();
         Iterable<MasterResponse> masterResponses = convertMaster(masters);
         model.put("master", masterResponses);
         model.put("idCall", idCall);
 
-        return "mastersForCall";
+        return model;
     }
 
-    public String viewMastersForKeyCar(String idKeyCar, Map<String, Object> model) {
+    public Map<String, Object> viewMastersForKeyCar(String idKeyCar, Map<String, Object> model) {
         Optional<KeyCar> keyCar = keyCarRepository.findById(Long.parseLong(idKeyCar));
 
         if (keyCar.isEmpty()) {
             model.put("message", "Заяки почему-то не существует");
-            return "adminError";
+            return model;
         } else if (keyCar.get().getMaster() != null) {
             model.put("message", "Мастер уже назначен");
-            return "adminError";
+            return model;
         }
         List<Master> masters = masterRepository.findAll();
         Iterable<MasterResponse> masterResponses = convertMaster(masters);
         model.put("master", masterResponses);
         model.put("idKeyCar", idKeyCar);
 
-        return "mastersForKeyCar";
+        return model;
     }
 
-    public String selectMasterForKeyCar(String idKeyCar, Person person, Long idMaster, Map<String, Object> model) {
+    public Map<String, Object> selectMasterForKeyCar(String idKeyCar, Person person, Long idMaster, Map<String, Object> model) {
         Admin admin = person.getAdmin();
         Optional<Master> master = masterRepository.findById(idMaster);
         Optional<KeyCar> keyCar = keyCarRepository.findById(Long.parseLong(idKeyCar));
         if (master.isEmpty() || keyCar.isEmpty()) {
             model.put("message", "Ошибка в selectMaster");
-            return "adminError";
+            return model;
         }
         admin.selectMasterForKeyCar(master.get(), keyCar.get(), keyCarRepository);
 
         model.put("message", "Мастеру отправленно уведовмление");
-        return "adminError";
+        return model;
     }
 
-    public String fillMainPage(Person person, Map<String, Object> model) {
+    public Map<String, Object> fillMainPage(Person person, Map<String, Object> model) {
         List<MasterCall> masterCalls = person.getAdmin().getMasterCalls();
         Iterable<MasterCallResponse> masterCallResponses = convertMasterCall(masterCalls);
 
@@ -117,7 +117,7 @@ public class AdminService {
         model.put("masterCalls", masterCallResponses);
         model.put("keyCar", keyCarsResponses);
 
-        return "mainAdmin";
+        return model;
     }
 
     private Iterable<KeyCarResponse> convertKeyCar(List<KeyCar> keyCars) {
@@ -132,7 +132,7 @@ public class AdminService {
             Master master = keyCar.getMaster();
             if (master == null) {
                 keyCarResponse.setStatus("Назначение мастера");
-            } else if (keyCar.getOffers() != null) {
+            } else if (!keyCar.getOffers().isEmpty()) {
                 keyCarResponse.setStatus("Закрыто");
             } else if (keyCar.isMasterAccept()) {
                 keyCarResponse.setStatus("В Процессе");

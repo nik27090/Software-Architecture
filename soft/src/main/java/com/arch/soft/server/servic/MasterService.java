@@ -10,8 +10,10 @@ import com.arch.soft.database.repos.MasterCallRepository;
 import com.arch.soft.database.repos.OfferRepository;
 import com.arch.soft.server.respmodel.KeyCarResponse;
 import com.arch.soft.server.respmodel.MasterCallResponse;
+import com.fasterxml.jackson.databind.ObjectReader;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -31,20 +33,24 @@ public class MasterService {
     }
 
 
-    public String closeKeyCar(String idKeyCar, Person person) {
+    public Map<String, Object> closeKeyCar(String idKeyCar, Person person) {
         KeyCar keyCar = keyCarRepository.findById(Long.parseLong(idKeyCar)).get();
         Master master = person.getMaster();
         master.closeKeyCar(keyCar, keyCarRepository);
 
-        return "redirect:/master/main";
+        Map<String, Object> model = new HashMap<>();
+        model.put("status", "all good");
+        return model;
     }
 
-    public String closeCall(String idCall, Person person) {
+    public Map<String, Object> closeCall(String idCall, Person person) {
+        Map<String, Object> model = new HashMap<>();
         MasterCall masterCall = masterCallRepository.findById(Long.parseLong(idCall)).get();
         Master master = person.getMaster();
         master.closeCall(masterCall, masterCallRepository);
 
-        return "redirect:/master/main";
+        model.put("status", "all good");
+        return model;
     }
 
     public String createReport(String report, long idCall, Person person) {
@@ -55,7 +61,7 @@ public class MasterService {
         return "redirect:/master/main";
     }
 
-    public String createOffer(String offerReq, long idKeyCar, Person person) {
+    public Map<String, Object> createOffer(String offerReq, long idKeyCar, Person person) {
         Master master = person.getMaster();
         KeyCar keyCar = keyCarRepository.findById(idKeyCar).get();
         Offer offer = new Offer();
@@ -63,10 +69,13 @@ public class MasterService {
         offer.setKeyCar(keyCar);
         master.createOffer(keyCar, keyCarRepository, offer, offerRepository);
 
-        return "redirect:/master/main";
+        Map<String, Object> model = new HashMap<>();
+        model.put("status", "all good");
+
+        return model;
     }
 
-    public String viewOrders(Person person, Map<String, Object> model) {
+    public Map<String, Object> viewOrders(Person person, Map<String, Object> model) {
         List<MasterCall> masterCalls = person.getMaster().getMasterCalls();
         Iterable<MasterCallResponse> masterCallResponses = convertMasterCallsForOld(masterCalls);
 
@@ -76,43 +85,51 @@ public class MasterService {
         model.put("keyCar", keyCarResponses);
         model.put("masterCalls", masterCallResponses);
 
-        return "ordersMaster";
+        return model;
     }
 
-    public String dontTakeOrderCall(long idCall, Person person) {
+    public Map<String, Object> dontTakeOrderCall(long idCall, Person person) {
+        Map<String, Object> model = new HashMap<>();
         MasterCall masterCall = masterCallRepository.findById(idCall).get();
         Master master = person.getMaster();
         master.dontTakeCall(masterCall, masterCallRepository);
 
-        return "redirect:/master/newOrders";
+        model.put("status", "all good");
+        return model;
     }
 
-    public String dontTakeOrderKeyCar(long idKeyCar, Person person) {
+    public Map<String, Object> dontTakeOrderKeyCar(long idKeyCar, Person person) {
+        Map<String, Object> model = new HashMap<>();
         KeyCar keyCar = keyCarRepository.findById(idKeyCar).get();
         Master master = person.getMaster();
         master.dontTakeKeyCar(keyCar, keyCarRepository);
 
-        return "redirect:/master/newOrders";
+        model.put("status", "all good");
+        return model;
     }
 
 
-    public String takeOrderCall(long idCall, Person person) {
+    public Map<String, Object> takeOrderCall(long idCall, Person person) {
+        Map<String, Object> model = new HashMap<>();
         MasterCall masterCall = masterCallRepository.findById(idCall).get();
         Master master = person.getMaster();
         master.takeOrderCall(masterCall, masterCallRepository);
 
-        return "redirect:/master/main";
+        model.put("status", "all good");
+        return model;
     }
 
-    public String takeOrderKeyCar(long idKeyCar, Person person) {
+    public Map<String, Object> takeOrderKeyCar(long idKeyCar, Person person) {
+        Map<String, Object> model = new HashMap<>();
         KeyCar keyCar = keyCarRepository.findById(idKeyCar).get();
         Master master = person.getMaster();
         master.takeOrderKeyCar(keyCar, keyCarRepository);
 
-        return "redirect:/master/main";
+        model.put("status", "all good");
+        return model;
     }
 
-    public String viewNewOrders(Person person, Map<String, Object> model) {
+    public Map<String, Object> viewNewOrders(Person person, Map<String, Object> model) {
         List<MasterCall> masterCalls = person.getMaster().getMasterCalls();
         Iterable<MasterCallResponse> masterCallResponses = convertMasterCallsForNew(masterCalls);
 
@@ -122,7 +139,7 @@ public class MasterService {
         model.put("masterCalls", masterCallResponses);
         model.put("keyCar", keyCarResponses);
 
-        return "newOrdersMaster";
+        return model;
     }
 
     private Iterable<KeyCarResponse> convertKeyCarForNew(List<KeyCar> keyCars) {
@@ -181,9 +198,13 @@ public class MasterService {
         callResponse.setDesc(call.getAutoInfo());
         callResponse.setId(call.getId());
         callResponse.setPrice(call.getPrice());
-        callResponse.setStatus("В ожидании ответа");
+        if (call.isActive()) {
+            callResponse.setStatus("В ожидании ответа");
+        } else {
+            callResponse.setStatus("Закрыто");
+        }
         if (call.getConclusion() == null) {
-            callResponse.setConclusion("В процессе");
+            callResponse.setStatus("В процессе");
         } else {
             callResponse.setConclusion(call.getConclusion());
         }
@@ -196,7 +217,11 @@ public class MasterService {
         keyCarResponse.setDesc(keyCar.getDesc());
         keyCarResponse.setId(keyCar.getId());
         keyCarResponse.setPrice(keyCar.getPrice());
-        keyCarResponse.setStatus("В ожидании ответа");
+        if (keyCar.isActive()) {
+            keyCarResponse.setStatus("В ожидании ответа");
+        } else {
+            keyCarResponse.setStatus("Закрыто");
+        }
 
         keyCarResponses.add(keyCarResponse);
     }

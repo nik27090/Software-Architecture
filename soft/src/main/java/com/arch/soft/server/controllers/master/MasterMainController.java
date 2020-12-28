@@ -2,19 +2,23 @@ package com.arch.soft.server.controllers.master;
 
 import com.arch.soft.database.model.person.Person;
 import com.arch.soft.server.servic.MasterService;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/master")
-@PreAuthorize("hasAuthority('MASTER')")
+@CrossOrigin(origins = "http://localhost:4200")
+@RequestMapping("/api/v1/master")
 public class MasterMainController {
 
     private final MasterService masterService;
@@ -23,100 +27,76 @@ public class MasterMainController {
         this.masterService = masterService;
     }
 
-    @GetMapping("/main")
-    public String mainPage(
-    ) {
-        return "mainMaster";
-    }
-
     @GetMapping("/newOrders")
-    public String newOrders(
-            @AuthenticationPrincipal Person person,
-            Map<String, Object> model) {
-        return masterService.viewNewOrders(person, model);
+    public ResponseEntity<Map<String, Object>> newOrders(
+            @AuthenticationPrincipal Person person) {
+        Map<String, Object> model = new HashMap<>();
+        return new ResponseEntity<>(masterService.viewNewOrders(person, model), HttpStatus.OK);
     }
 
     @GetMapping("/orders")
-    public String orders(
-            @AuthenticationPrincipal Person person,
-            Map<String, Object> model
+    public ResponseEntity<Map<String, Object>> orders(
+            @AuthenticationPrincipal Person person
     ) {
-        return masterService.viewOrders(person, model);
+        Map<String, Object> model = new HashMap<>();
+        return new ResponseEntity<>(masterService.viewOrders(person, model), HttpStatus.OK);
     }
 
     @GetMapping("/masterCall/{{idCall}}/ok")
-    public String agreeCall(
+    public ResponseEntity<Map<String, Object>> agreeCall(
             @AuthenticationPrincipal Person person,
-            @PathVariable("{idCall}") long idCall) {
-        return masterService.takeOrderCall(idCall, person);
+            @PathVariable("{idCall}") String idCall) {
+        return new ResponseEntity<>(masterService.takeOrderCall(Long.parseLong(idCall), person), HttpStatus.OK);
     }
 
     @GetMapping("/masterCall/{{idCall}}/cancel")
-    public String disagreeCall(
+    public ResponseEntity<Map<String, Object>> disagreeCall(
             @AuthenticationPrincipal Person person,
-            @PathVariable("{idCall}") long idCall) {
-        return masterService.dontTakeOrderCall(idCall, person);
+            @PathVariable("{idCall}") String idCall) {
+        return new ResponseEntity<>(masterService.dontTakeOrderCall(Long.parseLong(idCall), person), HttpStatus.OK);
     }
 
     @GetMapping("/keyCar/{{idKeyCar}}/ok")
-    public String agreeKeyCar(
+    public ResponseEntity<Map<String, Object>> agreeKeyCar(
             @AuthenticationPrincipal Person person,
-            @PathVariable("{idKeyCar}") long idKeyCar) {
-        return masterService.takeOrderKeyCar(idKeyCar, person);
+            @PathVariable("{idKeyCar}") String idKeyCar) {
+        return new ResponseEntity<>(masterService.takeOrderKeyCar(Long.parseLong(idKeyCar), person), HttpStatus.OK);
     }
 
     @GetMapping("/keyCar/{{idKeyCar}}/cancel")
-    public String disagreeKeyCar(
+    public ResponseEntity<Map<String, Object>> disagreeKeyCar(
             @AuthenticationPrincipal Person person,
-            @PathVariable("{idKeyCar}") long idKeyCar) {
-        return masterService.dontTakeOrderKeyCar(idKeyCar, person);
-    }
-
-    @GetMapping("/report/{{idCall}}")
-    public String createReportCall(
-            Map<String, Object> model,
-            @PathVariable("{idCall}") String idCall) {
-
-        model.put("idCall", idCall);
-        return "createReportMaster";
+            @PathVariable("{idKeyCar}") String idKeyCar) {
+        return new ResponseEntity<>(masterService.dontTakeOrderKeyCar(Long.parseLong(idKeyCar), person), HttpStatus.OK);
     }
 
     @PostMapping("/report/{{idCall}}")
     public String createReportCall(
             @AuthenticationPrincipal Person person,
-            String report,
+            @RequestBody String report,
             @PathVariable("{idCall}") long idCall) {
         return masterService.createReport(report, idCall, person);
     }
 
-    @GetMapping("/addOffer/{{idKeyCar}}")
-    public String addOffer(
-            Map<String, Object> model,
-            @PathVariable("{idKeyCar}") String idKeyCar
-    ) {
-        model.put("idKeyCar", idKeyCar);
-        return "createOffer";
-    }
-
     @PostMapping("/addOffer/{{idKeyCar}}")
-    public String addOffer(
-            String offer,
+    public ResponseEntity<Map<String, Object>> addOffer(
+            @RequestBody String offer,
             @AuthenticationPrincipal Person person,
-            @PathVariable("{idKeyCar}") long idKeyCar) {
-        return masterService.createOffer(offer, idKeyCar, person);
+            @PathVariable("{idKeyCar}") String idKeyCar) {
+        return new ResponseEntity<>(masterService.createOffer(offer, Long.parseLong(idKeyCar), person), HttpStatus.OK);
     }
 
     @GetMapping("/closeCall/{{idCall}}")
-    public String closeCall(
+    public ResponseEntity<Map<String, Object>> closeCall(
             @PathVariable("{idCall}") String idCall,
             @AuthenticationPrincipal Person person) {
-        return masterService.closeCall(idCall, person);
+        return new ResponseEntity<>(masterService.closeCall(idCall, person), HttpStatus.OK);
     }
 
     @GetMapping("/closeKeyCar/{{idKeyCar}}")
-    public String closeKeyCar(
+    public ResponseEntity<Map<String, Object>> closeKeyCar(
             @AuthenticationPrincipal Person person,
             @PathVariable("{idKeyCar}") String idKeyCar) {
-        return masterService.closeKeyCar(idKeyCar, person);
+        return new ResponseEntity<>(masterService.closeKeyCar(idKeyCar, person), HttpStatus.OK);
     }
 }

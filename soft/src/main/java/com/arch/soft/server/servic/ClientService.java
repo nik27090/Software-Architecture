@@ -37,12 +37,12 @@ public class ClientService {
         this.keyCarRepository = keyCarRepository;
     }
 
-    public String regClient(ClientRegistrationDto requestClient, Map<String, Object> model) {
+    public Map<String, Object> regClient(ClientRegistrationDto requestClient, Map<String, Object> model) {
         Person personFromDB = personRepository.findByUsername(requestClient.getUsername());
 
         if (personFromDB != null) {
             model.put("message", "Пользователь с таким username уже существует!");
-            return "registration";
+            return model;
         }
 
         Client client = new Client();
@@ -65,10 +65,10 @@ public class ClientService {
 
         clientRepository.save(client);
         personRepository.save(person);
-        return "redirect:/login";
+        return model;
     }
 
-    public String createKeyCar(MasterCallDto requestMasterCall, Person person, Map<String, Object> model) {
+    public Map<String, Object> createKeyCar(MasterCallDto requestMasterCall, Person person, Map<String, Object> model) {
         Client client = person.getClient();
 
         Long id = adminRepository.findMaxId();
@@ -76,20 +76,20 @@ public class ClientService {
         Optional<Admin> admin = adminRepository.findById(id);
         if (admin.isEmpty()) {
             model.put("message", "Нет админов");
-            return "masterCall";
+            return model;
         }
         client.createKeyCar(requestMasterCall.getDesc(), admin.get(), keyCarRepository);
 
-        return "redirect:/client/success";
+        return model;
     }
 
 
-    public String createMasterCall(MasterCallDto requestMasterCall, Person person, Map<String, Object> model) {
+    public Map<String, Object> createMasterCall(MasterCallDto requestMasterCall, Person person, Map<String, Object> model) {
         Client client = person.getClient();
 
         if (client == null) {
             model.put("message", "Вы зашли не под клиентским аккаунтом");
-            return "masterCall";
+            return model;
         }
 
         Long id = adminRepository.findMaxId();
@@ -97,25 +97,25 @@ public class ClientService {
         Optional<Admin> admin = adminRepository.findById(id);
         if (admin.isEmpty()) {
             model.put("message", "Нет админов");
-            return "masterCall";
+            return model;
         }
         client.createMasterCall(requestMasterCall.getDesc(), admin.get(), masterCallRepository);
 
-        return "redirect:/client/success";
+        return model;
     }
 
-    public String getStarsForCall(Person person, int star, long idCall) {
+    public int getStarsForCall(Person person, int star, long idCall) {
         Master master = masterCallRepository.findById(idCall).get().getMaster();
         person.getClient().addStar(star, master, masterRepository);
 
-        return "redirect:/client/mainUser";
+        return star;
     }
 
-    public String getStarsForKeyCar(Person person, int star, long idCall) {
+    public int getStarsForKeyCar(Person person, int star, long idCall) {
         Master master = keyCarRepository.findById(idCall).get().getMaster();
         person.getClient().addStar(star, master, masterRepository);
 
-        return "redirect:/client/mainUser";
+        return star;
     }
 
     public String viewStars(String idCall, Map<String, Object> model) {
@@ -124,7 +124,7 @@ public class ClientService {
         return "getStarUser";
     }
 
-    public String viewOrders(Person person, Map<String, Object> model) {
+    public Map<String, Object> viewOrders(Person person, Map<String, Object> model) {
         List<MasterCall> calls = person.getClient().getMasterCalls();
         Iterable<MasterCallResponse> masterCallResponses = convertMasterCall(calls);
 
@@ -134,7 +134,7 @@ public class ClientService {
         model.put("keyCar", keyCarResponses);
         model.put("masterCalls", masterCallResponses);
 
-        return "ordersUser";
+        return model;
     }
 
     private Iterable<KeyCarResponse> convertKeyCat(List<KeyCar> keyCars) {
@@ -149,7 +149,7 @@ public class ClientService {
             Master master = key.getMaster();
             if (master == null) {
                 keyCarResponse.setStatus("Назначение мастера");
-            } else if (key.getOffers() != null) {
+            } else if (!key.getOffers().isEmpty()) {
                 keyCarResponse.setStatus("Закрыто");
             } else if (key.isMasterAccept()) {
                 keyCarResponse.setStatus("В Процессе");
